@@ -66,38 +66,40 @@ Score: 0  Solution :  Artificial Intelligence<br>
 import random
 import string
 
-def generate_solution(answer):
-    return [random.choice(string.printable) for _ in answer]
+def generate_random_solution(answer):
+    length = len(answer)
+    return [random.choice(string.printable) for _ in range(length)]
 
 def evaluate(solution, answer):
-    return sum(abs(ord(a) - ord(b)) for a, b in zip(solution, answer))
+    diff = 0
 
-def simple_hill_climbing():
-    answer = input("Enter target string: ")
-    current = generate_solution(answer)
-    current_score = evaluate(current, answer)
+    for i in range(len(answer)):
+        diff += abs(ord(solution[i]) - ord(answer[i]))
 
-    while current_score > 0:
-        best = current
-        best_score = current_score
+    return diff
 
-        for i in range(len(answer)):
-            new = current.copy()
-            new[i] = answer[i]
-            new_score = evaluate(new, answer)
+def mutate_solution(solution):
+    index = random.randint(0, len(solution) - 1)
+    solution[index] = random.choice(string.printable)
+    return solution
 
-            if new_score < best_score:
-                best = new
-                best_score = new_score
+def SimpleHillClimbing(answer):
+    best = generate_random_solution(answer)
+    best_score = evaluate(best, answer)
 
-        current = best
-        current_score = best_score
+    while best_score != 0:
+        new_solution = mutate_solution(list(best))
+        score = evaluate(new_solution, answer)
 
-        print("Score:", current_score, "String:", ''.join(current))
+        if score < best_score:
+            best = new_solution
+            best_score = score
+            print("Score:", best_score, "Solution:", "".join(best))
 
-    print("Target Found:", ''.join(current))
+    print("Score:", best_score, "Solution:", "".join(best))
 
-simple_hill_climbing()
+answer = input("Enter target string: ")
+SimpleHillClimbing(answer)
 
 ```
 
