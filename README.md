@@ -63,53 +63,41 @@ Score: 0  Solution :  Artificial Intelligence<br>
 
 ## PROGRAM:
 ```
-import heapq
+import random
+import string
 
-def a_star(graph, start, goal, h):
-    queue = [(h[start], 0, start, [start])]
-    visited = set()
+def generate_solution(answer):
+    return [random.choice(string.printable) for _ in answer]
 
-    while queue:
-        f, g, node, path = heapq.heappop(queue)
+def evaluate(solution, answer):
+    return sum(abs(ord(a) - ord(b)) for a, b in zip(solution, answer))
 
-        if node == goal:
-            return path
+def simple_hill_climbing():
+    answer = input("Enter target string: ")
+    current = generate_solution(answer)
+    current_score = evaluate(current, answer)
 
-        if node in visited:
-            continue
+    while current_score > 0:
+        best = current
+        best_score = current_score
 
-        visited.add(node)
+        for i in range(len(answer)):
+            new = current.copy()
+            new[i] = answer[i]
+            new_score = evaluate(new, answer)
 
-        for next_node, cost in graph[node]:
-            if next_node not in visited:
-                new_g = g + cost
-                new_f = new_g + h[next_node]
-                heapq.heappush(queue, (new_f, new_g, next_node, path + [next_node]))
+            if new_score < best_score:
+                best = new
+                best_score = new_score
 
-    return None
+        current = best
+        current_score = best_score
 
-graph = {}
+        print("Score:", current_score, "String:", ''.join(current))
 
-n, e = map(int, input().split())
+    print("Target Found:", ''.join(current))
 
-for _ in range(e):
-    u, v, cost = input().split()
-    cost = int(cost)
-    graph.setdefault(u, []).append((v, cost))
-    graph.setdefault(v, []).append((u, cost))
-
-h = {}
-
-for _ in range(n):
-    node, value = input().split()
-    h[node] = int(value)
-
-path = a_star(graph, 'A', 'J', h)
-
-if path:
-    print("Path found:", path)
-else:
-    print("Path not found")
+simple_hill_climbing()
 
 ```
 
