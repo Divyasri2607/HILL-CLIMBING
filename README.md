@@ -63,57 +63,53 @@ Score: 0  Solution :  Artificial Intelligence<br>
 
 ## PROGRAM:
 ```
-import random
-import string
+import heapq
 
+def a_star(graph, start, goal, h):
+    queue = [(h[start], 0, start, [start])]
+    visited = set()
 
-def generate_random_solution(answer):
-    length = len(answer)
-    return [random.choice(string.printable) for _ in range(length)]
+    while queue:
+        f, g, node, path = heapq.heappop(queue)
 
+        if node == goal:
+            return path
 
-def evaluate(solution, answer):
-    target = list(answer)
-    diff = 0
+        if node in visited:
+            continue
 
-    for i in range(len(target)):
-        s = solution[i]
-        t = target[i]
+        visited.add(node)
 
-        # Calculate the ASCII difference between characters
-        diff += abs(ord(s) - ord(t))
+        for next_node, cost in graph[node]:
+            if next_node not in visited:
+                new_g = g + cost
+                new_f = new_g + h[next_node]
+                heapq.heappush(queue, (new_f, new_g, next_node, path + [next_node]))
 
-    return diff
+    return None
 
+graph = {}
 
-def mutate_solution(solution):
-    index = random.randint(0, len(solution) - 1)
-    solution[index] = random.choice(string.printable)
-    return solution
+n, e = map(int, input().split())
 
+for _ in range(e):
+    u, v, cost = input().split()
+    cost = int(cost)
+    graph.setdefault(u, []).append((v, cost))
+    graph.setdefault(v, []).append((u, cost))
 
-def simple_hill_climbing():
-    answer = "Artificial Intelligence"
+h = {}
 
-    # Generate initial random solution
-    best = generate_random_solution(answer)
-    best_score = evaluate(best, answer)
+for _ in range(n):
+    node, value = input().split()
+    h[node] = int(value)
 
-    while True:
-        print("Score:", best_score, "Solution:", "".join(best))
+path = a_star(graph, 'A', 'J', h)
 
-        # Stop when the solution matches the answer
-        if best_score == 0:
-            break
-
-        # Create a new solution by changing one character
-        new_solution = mutate_solution(list(best))
-        score = evaluate(new_solution, answer)
-
-
-        if score < best_score:
-            best = new_solution
-            best_score = score
+if path:
+    print("Path found:", path)
+else:
+    print("Path not found")
 
 ```
 
